@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 
 function Register() {
+  const navigate = useNavigate();
+  const [err, setErr] = useState(null); // Error state
+
   const [Inputs, setInputs] = useState({
     username: "",
     email: "",
     password: "",
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch("http://localhost:8000/users");
-        const data = await res.json();
-        console.log(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const res = await fetch("http://localhost:8000/users");
+  //       const data = await res.json();
+  //       console.log(data);
+  //     } catch (error) {
+  //       setErr(error);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,6 +36,10 @@ function Register() {
       });
       const data = await res.json();
       console.log(data);
+      setErr(data.error);
+      if (data.message) {
+        navigate("/login");
+      }
     } catch (err) {
       console.log(err);
     }
@@ -63,6 +71,7 @@ function Register() {
         <button type="submit" onClick={(e) => handleSubmit(e)}>
           Register
         </button>
+        {err && <p>{err}</p>}
         <span>
           Already have an accout?
           <Link to="/login"> Login</Link>
