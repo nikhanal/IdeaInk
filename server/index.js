@@ -79,10 +79,96 @@ app.post("/api/auth/login", async (req, res) => {
     .json(user);
 });
 
-//logout
-app.get("/api/auth/logout", (req, res) => {
-  res.clearCookie("token").json({ message: "Logged out" });
+//posts
+app.get("/api/posts", async (req, res) => {
+  try {
+    const q = req.query.cat
+      ? "SELECT * FROM posts WHERE category = ?"
+      : "SELECT * FROM posts";
+    const result = await executeQuery(q, [req.query.cat]);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Something went wrong",
+    });
+  }
 });
+
+//post by id
+app.get("/api/posts/:id", async (req, res) => {
+  try {
+    const q =
+      "SELECT `username`,`title`,`desc`,p.img,`category`,`date` FROM users u JOIN posts p ON u.id = p.uid WHERE p.id = ?";
+    const result = await executeQuery(q, [req.params.id]);
+    if (!result[0]) {
+      return res.status(404).json({
+        error: "Post not found",
+      });
+    }
+    return res.status(200).json(result[0]);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Something went wrong",
+    });
+  }
+});
+
+//create post
+app.post("/api/posts", async (req, res) => {
+  try {
+    const q = "INSERT INTO posts (title, content) VALUES (?, ?)";
+    const result = await executeQuery(q, [req.body.title, req.body.content]);
+    return res.status(200).json({
+      message: "Post created successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Something went wrong",
+    });
+  }
+});
+
+//update post
+app.put("/api/posts/:id", async (req, res) => {
+  try {
+    const q = "UPDATE posts SET title = ?, content = ? WHERE id = ?";
+    const result = await executeQuery(q, [
+      req.body.title,
+      req.body.content,
+      req.params.id,
+    ]);
+    return res.status(200).json({
+      message: "Post updated successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Something went wrong",
+    });
+  }
+});
+
+//delete post
+
+app.delete("/api/posts/:id", async (req, res) => {
+  try {
+    const q = "DELETE FROM posts WHERE id = ?";
+    const result = await executeQuery(q, [req.params.id]);
+    return res.status(200).json({
+      message: "Post deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Something went wrong",
+    });
+  }
+});
+
+//upload file
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
