@@ -59,6 +59,7 @@ app.post("/api/auth/login", async (req, res) => {
       error: "User not found",
     });
   }
+
   const isPasswordCorrect = await bcrypt.compare(
     req.body.password,
     result[0].password
@@ -70,7 +71,17 @@ app.post("/api/auth/login", async (req, res) => {
   }
   const token = Jwt.sign({ id: result[0].id }, "jwtkey");
   const { password, ...user } = result[0];
-  res.cookie("access_token", token, { httpOnly: true }).json(user);
+  res
+    .cookie("token", token, {
+      httpOnly: true,
+      sameSite: true,
+    })
+    .json(user);
+});
+
+//logout
+app.get("/api/auth/logout", (req, res) => {
+  res.clearCookie("token").json({ message: "Logged out" });
 });
 
 app.listen(port, () => {

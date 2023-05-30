@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/logo.png";
+
 function Navbar() {
   return (
     <div className="navbar">
@@ -27,7 +28,9 @@ function Navbar() {
             <h6>HEALTH</h6>
           </Link>
           <span>Nishan</span>
-          <span>Logout</span>
+          <Link to="/login" className="link">
+            Login
+          </Link>
           <span className="write">
             <Link to="/write">Write</Link>
           </span>
